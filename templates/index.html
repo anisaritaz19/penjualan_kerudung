@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Beranda | Penjualan Hijab</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #fce4ec; /* pink muda */
+        }
+        .card {
+            border: 2px solid #c8e6c9; /* hijau pastel */
+        }
+        .btn-primary {
+            background-color: #f48fb1;
+            border-color: #f48fb1;
+        }
+        .btn-success {
+            background-color: #aed581;
+            border-color: #aed581;
+        }
+        .btn-info {
+            background-color: #81d4fa;
+            border-color: #81d4fa;
+        }
+        .btn-danger {
+            background-color: #ef9a9a;
+            border-color: #ef9a9a;
+        }
+        .badge.bg-secondary {
+            background-color: #ce93d8;
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="container bg-white shadow rounded p-4">
+        <h2 class="mb-4 text-center text-success">🧕 Daftar Produk Hijab</h2>
+
+        {% if current_user.is_authenticated %}
+            <div class="d-flex justify-content-between mb-3">
+                <a href="{{ url_for('tambah_produk') }}" class="btn btn-success">+ Tambah Produk</a>
+                {% if current_user.role == 'admin' %}
+                    <a href="{{ url_for('daftar_pesanan') }}" class="btn btn-info">📄 Lihat Daftar Pesanan</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
+            </div>
+        {% else %}
+            <a href="{{ url_for('login') }}" class="btn btn-primary mb-3">Login</a>
+        {% endif %}
+
+        <div class="row">
+            {% for p in produk %}
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    {% if p.gambar %}
+                    <img src="{{ url_for('static', filename='img/' ~ p.gambar) }}" class="card-img-top" alt="{{ p.nama }}" style="height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ p.nama }}</h5>
+                        <p class="card-text mb-1">Jenis: {{ p.jenis_kain }}</p>
+                        <p class="card-text mb-1">Warna: <span class="badge bg-secondary">{{ p.warna }}</span></p>
+                        <p class="card-text mb-1">Harga: <strong>Rp {{ "{:,}".format(p.harga) }}</strong></p>
+                        <p class="card-text text-muted" style="font-size: 0.9rem;">{{ p.deskripsi }}</p>
+
+                        {% if current_user.is_authenticated %}
+                            {% if current_user.role == 'admin' %}
+                                <a href="{{ url_for('hapus_produk', id=p.id) }}" class="btn btn-sm btn-outline-danger">Hapus</a>
+                            {% else %}
+                                <a href="{{ url_for('pesan_produk', id=p.id) }}" class="btn btn-sm btn-primary">Pesan</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="mt-4 text-center">
+            <p>Total produk dipesan: <strong>{{ total_pesanan }}</strong></p>
+        </div>
+    </div>
+</body>
+</html>
